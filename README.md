@@ -1,6 +1,7 @@
 # pareto
-
+This page run a simulation to show how Pareto distribution works in a closed environment.
 ## Project setup
+use npm to install all the needed packages:
 ```
 npm install
 ```
@@ -15,5 +16,5 @@ npm run serve
 npm run build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Customize Simulations
+Which economic model works best? Try your hand at socialism by implementing a progressive tax scheme. Or stick with capitalism that rewards hard work and persistence.
