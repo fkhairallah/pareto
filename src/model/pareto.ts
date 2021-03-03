@@ -1,79 +1,90 @@
+import Player from './Player';
+
 export default class sim {
-    public numberOfPlayers: number;
-    public initialCapital: number;
-    public currentNetWorth: number[] = [];
-    public players: number[] = [];
-    public iteration: number;
-    public numberBankrupt: number;
-    public richest: number;
-    public poorest: number;
+    public players: Player[] = [];
+
+    // public numberOfPlayers: number;
+    public initialCapital: number=0;
+    public iteration: number=0;
+    public finished: boolean = true;
+
+    //statuses
+    public numberBankrupt: number=0;
+    public richest: number=0;
+    public poorest: number=0;
     public bankruptLevel: number=0;
     public poorLevel: number=0;
     public middleLevel: number=0;
     public upperLevel: number=0;
 
     // socialism
-    public taxTheRich: Boolean;
+    public taxTheRich: Boolean=false;
     public richTaxPercentage: number = 30;
-    public giveWelfare: Boolean
+    public giveWelfare: Boolean = false;
     public welfarePercentage: number = 20;
 
-    // capitalism
-    public increaseMotivation: Boolean;
-    public motivationPercentage: number = 5;
+    // // capitalism
+    // public increaseMotivation: Boolean= false;
+    // public motivationPercentage: number = 5;
 
     public isPoor(player: number): Boolean {
-        return this.currentNetWorth[player] <= (this.poorLevel);
+        return this.players[player].netWorth <= (this.poorLevel);
     }
     isLowerMiddleClass(player: number): Boolean {
-        return ((this.currentNetWorth[player] > this.poorLevel) && (this.currentNetWorth[player] <= this.middleLevel))
+        return ((this.players[player].netWorth > this.poorLevel) && (this.players[player].netWorth <= this.middleLevel))
     }
     isMiddleClass(player: number): Boolean {
-        return ((this.currentNetWorth[player] > this.middleLevel) && (this.currentNetWorth[player] <= this.upperLevel))
+        return ((this.players[player].netWorth > this.middleLevel) && (this.players[player].netWorth <= this.upperLevel))
     }
     public isUpperClass(player: number): Boolean {
-        return (this.currentNetWorth[player] > this.upperLevel)
+        return (this.players[player].netWorth > this.upperLevel)
     }
 
 
 
-    constructor(players: number, capital: number) {
-        this.numberOfPlayers = players;
+    constructor() { }
+
+    public configureSimulation(capital:number=20)
+    {
+        this.players = [];
         this.initialCapital = capital;
         this.richest = capital;
         this.poorest = capital;
         this.taxTheRich = false;
         this.giveWelfare = false;
-        this.increaseMotivation = false;
-        this.currentNetWorth = Array(this.numberOfPlayers);
-        for (var i: number = 0; i < this.numberOfPlayers; i++) {
-            this.players[i] = i+1;
-            this.currentNetWorth[i] = this.initialCapital;
-        }
+        //this.increaseMotivation = false;
         this.iteration = 0;
         this.numberBankrupt = 0;
         this.richest = this.initialCapital;
+        this.poorest = this.initialCapital;
 
-        this.resetLevels();
-
-    }
-    public abSilverSpoon(ratio:number)
-    {
-        for (var i: number = 0; i < this.numberOfPlayers; i++) {
-            this.players[i] = i+1;
-            this.currentNetWorth[i] = this.initialCapital;
-            if (i<(this.numberOfPlayers/2)) this.currentNetWorth[i] /= ratio;
-        }
-
-    }
-
-    public resetLevels(): void {
         this.bankruptLevel = this.initialCapital * 0.1;
         this.poorLevel = this.initialCapital * 0.2;
         this.middleLevel = this.initialCapital * 0.4;
         this.upperLevel = this.initialCapital * 0.8;
 
+        this.finished = false;
+
     }
+
+
+    public configurePlayers(numberOfPlayers:number, samplePlayer:Player)
+    {
+        var newPlayer: Player = new Player;
+
+        for (var i=0;i<numberOfPlayers;i++)
+        {
+            newPlayer = Object.assign({},samplePlayer);
+            newPlayer.name += i.toString();
+            newPlayer.netWorth = this.initialCapital * newPlayer.silverSpoonRatio;
+            this.players.push(newPlayer);
+        }
+
+        // set richest & poorest levels
+        if (this.richest < newPlayer.netWorth) this.richest = newPlayer.netWorth;
+        if (this.poorest > newPlayer.netWorth) this.poorest = newPlayer.netWorth;
+    }
+
 
     public run(n: number) {
         var i: number;
@@ -81,48 +92,54 @@ export default class sim {
 
         for (i = 0; i < n; i++) {
             // do nothing unless there is at least 2 players
-            if ((this.numberOfPlayers - this.numberBankrupt) < 3) return;
+            if ((this.players.length - this.numberBankrupt) <= 3){
+                this.finished = true;
+                return;
+            } 
 
+            // Pick a non-bankrupt player at random
             do {
-                var player1: number = (Math.floor(Math.random() * (this.numberOfPlayers)));
+                var player1: number = (Math.floor(Math.random() * (this.players.length)));
 
             }
-            while (this.currentNetWorth[player1] <= this.bankruptLevel);
+            while (this.players[player1].netWorth <= this.bankruptLevel);
 
+            // Pick a second player
             do {
-                var player2: number = (Math.floor(Math.random() * (this.numberOfPlayers)));
+                var player2: number = (Math.floor(Math.random() * (this.players.length)));
 
             }
             //				while (player1 == player2);
-            while ((this.currentNetWorth[player2] <= this.bankruptLevel) || (player1 == player2));
+            while ((this.players[player2].netWorth <= this.bankruptLevel) || (player1 == player2));
 
-            var chance: number = Math.random();
-            if (this.increaseMotivation)	// increase the motivation of lower middle class and poor
+            // play them against each other: random # and then adjust by 5% for motivation
+            var chance1: number = Math.random() + (5/100 * this.players[player1].motivationFactor);
+            var chance2: number = Math.random() + (5/100 * this.players[player2].motivationFactor);
+            if (chance1>chance2) 
             {
-                if (this.isLowerMiddleClass(player1)) chance += this.motivationPercentage / 100.0;
-                if (this.isLowerMiddleClass(player2)) chance -= this.motivationPercentage / 100.0;
-                if (this.isPoor(player1)) chance += this.motivationPercentage * 1.5 / 100.0;
-                if (this.isPoor(player2)) chance -= this.motivationPercentage * 1.5 / 100.0;
+                this.players[player1].netWorth++;
+                this.players[player2].netWorth--;
             }
-            var kitty: number = ((Math.floor(chance * 10)) > 5) ? 1 : -1;
-
-            this.currentNetWorth[player1] += kitty;
-            this.currentNetWorth[player2] -= kitty;
+            else
+            {
+                this.players[player1].netWorth--;
+                this.players[player2].netWorth++;
+            }
 
             if (this.giveWelfare)	// give welfare to anyone that drops below the poverty line
             {
-                for (j = 0; j < this.numberOfPlayers; j++)
-                    if (this.currentNetWorth[j] < this.bankruptLevel)
-                        this.currentNetWorth[j] += 1;
+                for (j = 0; j < this.players.length; j++)
+                    if (this.players[j].netWorth < this.bankruptLevel)
+                        this.players[j].netWorth += 1;
             }
 
             this.iteration++;
 
             this.numberBankrupt = 0;
-            for (j = 0; j < this.numberOfPlayers; j++) {
-                if (this.currentNetWorth[j] <= this.bankruptLevel) this.numberBankrupt++;
-                if (this.currentNetWorth[j] > this.richest) this.richest = this.currentNetWorth[j];
-                if (this.currentNetWorth[j] < this.poorest) this.poorest = this.currentNetWorth[j];
+            for (j = 0; j < this.players.length; j++) {
+                if (this.players[j].netWorth <= this.bankruptLevel) this.numberBankrupt++;
+                if (this.players[j].netWorth > this.richest) this.richest = this.players[j].netWorth;
+                if (this.players[j].netWorth < this.poorest) this.poorest = this.players[j].netWorth;
             }
 
         }
@@ -130,6 +147,9 @@ export default class sim {
     }
 
     public stat(): String {
+
+        if (this.players.length == 0) return "";
+        else
         
         return "[#" + this.iteration + "] " 
             + this.numberBankrupt + " bankrupt. Inequality ratio " 

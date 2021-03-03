@@ -2,15 +2,82 @@
   <v-container fluid fill-height>
     <v-row class="text-center">
       <v-col cols="4">
-        <v-switch v-model="runFlag" @click="runSim" inset label="Run Simulation" />
-        <v-switch v-model="silverSpoonFlag" inset label="Silver Spoon" />
-        <v-switch v-model="sim.taxTheRich" inset label="Tax the Rich" />
-        <v-switch v-model="sim.giveWelfare" inset label="Distribute welfate to the poor" />
-        <v-switch v-model="sim.increaseMotivation" inset label="Work Hard!" />
+        <v-card v-if="configMode">
+          <v-card-title class="headline grey lighten-2">
+            Configure Simulation
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-row>
+                <v-text-field
+                  label="Initial Net Worth"
+                  prefix="$"
+                  v-model="initialCapital"
+                  type="number"
+                  value="20"
+                ></v-text-field>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <h2>Red Players</h2>
+                  <v-text-field label="Number of Players" v-model="numberRedPlayers" value="10" type="number" ></v-text-field>
+                  <v-combobox v-model="redFamily" :items="familyCodeList" dense solo></v-combobox>
+                  <v-combobox v-model="redMotivation" :items="motivationCodeList" dense solo></v-combobox>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col>
+                  <h2>Blue Players</h2>
+                  <v-text-field
+                    label="Number of Players"
+                    v-model="numberBluePlayers"
+                    value="10"
+                    type="number"
+                  ></v-text-field>
+                  <v-combobox v-model="blueFamily" :items="familyCodeList" dense solo></v-combobox>
+                  <v-combobox v-model="blueMotivation" :items="motivationCodeList" dense  solo></v-combobox>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-btn dark color="primary" @click="configureSimulation">Run Simulation</v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-card v-else>
+          <v-card-title class="headline grey lighten-2">
+            Paredo Simulation
+          </v-card-title>
+
+          <v-card-text>
+            <v-form>
+              <v-slider hint="Adjust the speed of the simulation: # transactions between updates" thumb-label  max="500"  min="40" label="Speed" v-model="simulationSpeed"></v-slider>
+              <v-switch v-model="sim.taxTheRich" inset label="Tax the Rich" />
+              <v-switch
+                v-model="sim.giveWelfare"
+                inset
+                label="Distribute welfate to the poor"
+              />
+            </v-form>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-btn v-if="runFlag" dark color="primary" @click="pauseSimulation"> Pause </v-btn>
+            <v-btn v-else dark color="primary" @click="startSimulation"> Start </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn dark @click="cancelSimulation"> Cancel </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-col>
       <v-col>
-        <p>{{sim.stat()}}</p>
-        <line-chart ref="simChart"
+        <h3>{{legend}}</h3>
+        <p>{{ sim.stat() }}</p>
+        <line-chart
+          ref="simChart"
           :chart-data="dataCollection"
           :options="options"
         ></line-chart>
@@ -22,9 +89,10 @@
 <script>
 import LineChart from "./BarChart";
 import Pareto from "../model/pareto";
+import Player from '@/model/Player';
 
-const pSim = new Pareto(20,20);
-var simInterval=0;
+const pSim = new Pareto(20, 20);
+var simInterval = 0;
 
 export default {
   name: "Chart",
@@ -33,42 +101,88 @@ export default {
   },
   data() {
     return {
+
+      // data used in configuration vCard data collection
+      initialCapital: 20, // initial capital to start
+      numberRedPlayers: 10, // # of red players
+      numberBluePlayers: 10, // # of red players
+      redFamily: {text: "", value: 1},
+      redMotivation:  {text: "", value: 0},
+      blueFamily: {text: "", value: 1},
+      blueMotivation:  {text: "", value: 0},
+
+
+      motivationCodeList: [
+        {
+          text: "Average",
+          value: 0,
+        },
+        {
+          text: "Make Bad Choices",
+          value: -1,
+        },
+        {
+          text: "Motivated",
+          value: 1,
+        },
+      ],
+      familyCodeList: [
+        {
+          text: "Middle Class",
+          value: 1,
+        },
+        {
+          text: "Rich Dad",
+          value: 2,
+        },
+        {
+          text: "Poor Dad",
+          value: 0.5,
+        },
+      ],
+
+      configMode: true, // is the simulation in run or config mode
       runFlag: false,
-      silverSpoonFlag: false,
+      simulationSpeed: 50,  // speed of simulation
+
+      // pareto simulation initial configuration
       sim: pSim,
-      psimStat: "",
+      legend: "Pareto Distribution Simulation",
+
+      // Chart initial configuration
       dataCollection: {
-        labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+        labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,],
         datasets: [
           {
             label: "Net Worth",
-            backgroundColor: ["#f87979"],
-            data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
-          }
-        ]
+            backgroundColor: ["#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979"],
+            data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,],
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
           display: true,
+           yAxes: [{
+            ticks: {
+                beginAtZero: true
+            }
+        }]
         },
         legend: {
-          display: false
+          display: false,
         },
         animation: {
           duration: 200,
-        }
+        },
       },
     };
   },
-  computed: {
-      
-  },
+  computed: {},
   mounted() {
-    //this.fillData();
-    //pSim.run(20);
-    //console.log("Psim=",pSim.stat())
+
   },
   deactivated() {
     console.log("deactivated");
@@ -77,33 +191,76 @@ export default {
     console.log("befoneUnmount");
   },
   methods: {
-     
-    runSim() {
-      console.log("@click", this.runFlag);
-      if (this.silverSpoonFlag) pSim.abSilverSpoon(2);
-      if (this.runFlag) {
-        console.log("Sim on");
-        simInterval = setInterval(() => {
-          pSim.run(pSim.initialCapital*3);
-          for (var i=0;i<pSim.currentNetWorth.length;i++){
-            this.dataCollection.datasets[0].data[i] = pSim.currentNetWorth[i];
-            if (pSim.isPoor(i)) this.dataCollection.datasets[0].backgroundColor[i] = "#f80000";
-            if (pSim.isLowerMiddleClass(i)) this.dataCollection.datasets[0].backgroundColor[i] = "#f800f8";
-            if (pSim.isMiddleClass(i)) this.dataCollection.datasets[0].backgroundColor[i] = "#0000dd";
-            if (pSim.isUpperClass(i)) this.dataCollection.datasets[0].backgroundColor[i] = "#00dd00";
+    configureSimulation() {
+      pSim.configureSimulation(this.initialCapital);
+      var redPlayer = new Player();
+      redPlayer.name = "Red";
+      redPlayer.color = '#FF0000';
+      console.log("red",this.redFamily, this.redMotivation)
+      redPlayer.silverSpoonRatio = this.redFamily.value;
+      redPlayer.motivationFactor = this.redMotivation.value;
+      pSim.configurePlayers(this.numberRedPlayers,redPlayer); // Red Players
 
-          }
-          //this.psimStat = pSim.stat();
-          console.log(this.dataCollection.datasets[0].data);
-          this.$refs.simChart.refresh();          
-        }, 1000);
-      } else {
-        console.log("Sim OFF");
-        if (simInterval) clearInterval(simInterval);
+      var bluePlayer = new Player();
+      bluePlayer.name = "Blue";
+      bluePlayer.color = '#0000FF';
+      bluePlayer.silverSpoonRatio = this.blueFamily.value;
+      bluePlayer.motivationFactor = this.blueMotivation.value;
+      pSim.configurePlayers(this.numberBluePlayers,bluePlayer); // Blue Players
+      console.log(pSim.players);
+
+      this.legend = `Red Players ${this.redMotivation.text} from ${this.redFamily.text}, Blue Players ${this.blueMotivation.text} from ${this.blueFamily.text}`
+
+      for (var i = 0; i < pSim.players.length; i++) {
+          this.dataCollection.datasets[0].data[i] = pSim.players[i].netWorth;
+          this.dataCollection.datasets[0].backgroundColor[i] = pSim.players[i].color;
       }
-
-    },
+      this.$refs.simChart.refresh();
+      this.configMode = false;
   
+    },
+
+    // cancel the simulation and return to config mode
+    cancelSimulation() {
+      this.configMode = true;
+      this.runFlag = false;
+      console.log("Stop!")
+      if (simInterval) {
+        clearInterval(simInterval);
+        simInterval = null;
+      }
+    },
+
+    // start or restart the simulation. If the run is complete. it stops
+    startSimulation() {
+      this.runFlag = true;
+       simInterval = setInterval(() => {
+          pSim.run(this.simulationSpeed);
+          for (var i = 0; i < pSim.players.length; i++) {
+            this.dataCollection.datasets[0].data[i] = pSim.players[i].netWorth;
+            this.dataCollection.datasets[0].backgroundColor[i] = pSim.players[i].color;
+          }
+          this.$refs.simChart.refresh();
+
+          if (pSim.finished) {
+            console.log("Simulation Done");
+            clearInterval(simInterval);
+            this.runFlag = false;
+          }
+
+        }, 1000);
+    },
+
+    // pause the simulation for discussion point
+    pauseSimulation() {
+      this.runFlag = false;
+      console.log("Pause!")
+      if (simInterval) {
+        clearInterval(simInterval);
+        simInterval = null;
+      }
+    },
+
   },
 };
 </script>
