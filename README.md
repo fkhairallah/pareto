@@ -1,5 +1,5 @@
 # pareto
-This page run a simulation to show how Pareto distribution works in a closed environment.
+This page run a simulation to show how Pareto Principle works in a closed economic environment.
 ## Project setup
 use npm to install all the needed packages:
 ```

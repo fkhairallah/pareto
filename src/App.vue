@@ -17,8 +17,15 @@
 
 
 
-        <span class="mr-2">Pareto Distribution Simulation</span>
+        <span class="mr-2">Pareto Principle Simulation</span>
          <v-spacer></v-spacer>
+         <v-btn
+        flat
+        href="https://en.wikipedia.org/wiki/Pareto_principle"
+        target="_blank"
+      >
+        <span class="mr-2">Background</span>
+      </v-btn>
     </v-app-bar>
 
     <v-main>

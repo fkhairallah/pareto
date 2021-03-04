@@ -4,7 +4,7 @@ export default class sim {
     public players: Player[] = [];
 
     // public numberOfPlayers: number;
-    public initialCapital: number=0;
+    public initialCapital: number=20;
     public iteration: number=0;
     public finished: boolean = true;
 
@@ -18,7 +18,7 @@ export default class sim {
     public upperLevel: number=0;
 
     // socialism
-    public taxTheRich: Boolean=false;
+    public taxTheRich: Boolean=true;
     public richTaxPercentage: number = 30;
     public giveWelfare: Boolean = false;
     public welfarePercentage: number = 20;
@@ -36,7 +36,7 @@ export default class sim {
     isMiddleClass(player: number): Boolean {
         return ((this.players[player].netWorth > this.middleLevel) && (this.players[player].netWorth <= this.upperLevel))
     }
-    public isUpperClass(player: number): Boolean {
+    public isRich(player: number): Boolean {
         return (this.players[player].netWorth > this.upperLevel)
     }
 
@@ -60,7 +60,7 @@ export default class sim {
 
         this.bankruptLevel = this.initialCapital * 0.1;
         this.poorLevel = this.initialCapital * 0.2;
-        this.middleLevel = this.initialCapital * 0.4;
+        this.middleLevel = this.initialCapital * 0.5;
         this.upperLevel = this.initialCapital * 0.8;
 
         this.finished = false;
@@ -91,7 +91,7 @@ export default class sim {
         var j: number;
 
         for (i = 0; i < n; i++) {
-            // do nothing unless there is at least 2 players
+            // Stop  if there is 2 players 
             if ((this.players.length - this.numberBankrupt) <= 3){
                 this.finished = true;
                 return;
@@ -119,17 +119,21 @@ export default class sim {
             {
                 this.players[player1].netWorth++;
                 this.players[player2].netWorth--;
+                if ( (this.isRich(player1)) && this.taxTheRich)
+                    this.players[player1].netWorth -= this.richTaxPercentage/100;
             }
             else
             {
                 this.players[player1].netWorth--;
                 this.players[player2].netWorth++;
+                if ( (this.isRich(player2)) && this.taxTheRich)
+                    this.players[player2].netWorth -= this.richTaxPercentage/100;
             }
 
             if (this.giveWelfare)	// give welfare to anyone that drops below the poverty line
             {
                 for (j = 0; j < this.players.length; j++)
-                    if (this.players[j].netWorth < this.bankruptLevel)
+                    if (this.players[j].netWorth <= this.bankruptLevel)
                         this.players[j].netWorth += 1;
             }
 

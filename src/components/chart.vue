@@ -8,14 +8,8 @@
           </v-card-title>
           <v-card-text>
             <v-form>
-              <v-row>
-                <v-text-field
-                  label="Initial Net Worth"
-                  prefix="$"
-                  v-model="initialCapital"
-                  type="number"
-                  value="20"
-                ></v-text-field>
+              <v-row class="pt-3">
+                <v-text-field label="Initial Net Worth" prefix="$" v-model="sim.initialCapital" type="number"></v-text-field>
               </v-row>
               <v-row>
                 <v-col>
@@ -54,12 +48,16 @@
           <v-card-text>
             <v-form>
               <v-slider hint="Adjust the speed of the simulation: # transactions between updates" thumb-label  max="500"  min="40" label="Speed" v-model="simulationSpeed"></v-slider>
-              <v-switch v-model="sim.taxTheRich" inset label="Tax the Rich" />
-              <v-switch
-                v-model="sim.giveWelfare"
-                inset
-                label="Distribute welfate to the poor"
-              />
+              <v-row>
+                <v-switch v-model="sim.taxTheRich" inset label="Tax the Rich" />
+                <v-spacer></v-spacer>
+                <v-text-field append-icon="%" v-model="sim.richTaxPercentage" type="number" class="shrink"></v-text-field>
+              </v-row>
+              <v-row>
+                <v-switch v-model="sim.giveWelfare"   inset label="Give enough welfare to lift above powerty line"/>
+                <v-spacer></v-spacer>
+                <!-- <v-text-field append-icon="%" v-model="sim.welfarePercentage" type="number" class="shrink"></v-text-field> -->
+              </v-row>
             </v-form>
           </v-card-text>
 
@@ -103,7 +101,7 @@ export default {
     return {
 
       // data used in configuration vCard data collection
-      initialCapital: 20, // initial capital to start
+      //initialCapital: 20, // initial capital to start
       numberRedPlayers: 10, // # of red players
       numberBluePlayers: 10, // # of red players
       redFamily: {text: "", value: 1},
@@ -147,7 +145,7 @@ export default {
 
       // pareto simulation initial configuration
       sim: pSim,
-      legend: "Pareto Distribution Simulation",
+      legend: "Pareto Principle Simulation",
 
       // Chart initial configuration
       dataCollection: {
@@ -155,7 +153,7 @@ export default {
         datasets: [
           {
             label: "Net Worth",
-            backgroundColor: ["#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979"],
+            backgroundColor: ["#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979","#f87979", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0", "#4eb9f0"],
             data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,],
           },
         ],
@@ -214,9 +212,11 @@ export default {
       for (var i = 0; i < pSim.players.length; i++) {
           this.dataCollection.datasets[0].data[i] = pSim.players[i].netWorth;
           this.dataCollection.datasets[0].backgroundColor[i] = pSim.players[i].color;
+          this.dataCollection.labels[i] = `P${i+1}`
       }
       this.$refs.simChart.refresh();
       this.configMode = false;
+      console.log(pSim.players.length," Players")
   
     },
 
