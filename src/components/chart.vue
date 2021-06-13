@@ -86,6 +86,18 @@
             Paredo Simulation
           </v-card-title>
 
+          <v-card-actions>
+            <v-btn v-if="runFlag" dark color="primary" @click="pauseSimulation">
+              Pause
+            </v-btn>
+            <v-btn v-else dark color="primary" @click="startSimulation">
+              Start
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn dark @click="cancelSimulation"> Cancel </v-btn>
+          </v-card-actions>
+          <v-divider></v-divider>
+
           <v-card-text>
             <v-form>
               <v-slider
@@ -97,39 +109,26 @@
                 v-model="simulationSpeed"
               ></v-slider>
               <v-row>
-                <v-switch v-model="sim.taxTheRich" inset label="Tax the Rich" />
+                <v-switch v-model="sim.taxTheRich" label="Tax the Wealthy" />
                 <v-spacer></v-spacer>
                 <v-text-field
                   append-icon="%"
                   v-model="sim.richTaxPercentage"
                   type="number"
-                  class="shrink"
+                  class="shortTextField"
                 ></v-text-field>
               </v-row>
               <v-row>
                 <v-switch
                   v-model="sim.giveWelfare"
                   inset
-                  label="Give enough welfare to lift above powerty line"
+                  label="Give Welfare to lift above powerty line"
                 />
-                <v-spacer></v-spacer>
                 <!-- <v-text-field append-icon="%" v-model="sim.welfarePercentage" type="number" class="shrink"></v-text-field> -->
               </v-row>
             </v-form>
           </v-card-text>
 
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-btn v-if="runFlag" dark color="primary" @click="pauseSimulation">
-              Pause
-            </v-btn>
-            <v-btn v-else dark color="primary" @click="startSimulation">
-              Start
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn dark @click="cancelSimulation"> Cancel </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -339,3 +338,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.shortTextField{
+      width: 60px;
+}
+</style>
