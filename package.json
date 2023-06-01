@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^3.0.1",
-    "@capacitor/cli": "^3.0.1",
+    "@capacitor/cli": "^5.0.4",
     "@capacitor/core": "^3.0.1",
     "chart.js": "^2.9.4",
     "vue": "^2.6.11",
@@ -19,8 +19,8 @@
     "vuetify": "^2.4.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "sass": "^1.32.0",
     "sass-loader": "^10.0.0",
     "typescript": "~3.9.3",
