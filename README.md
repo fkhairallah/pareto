@@ -1,7 +1,9 @@
 # pareto
 This page run a simulation to show how Pareto Principle works in a closed economic environment.
 
-This was developed as a way for me to learn Vue.js and Veutify.
+This was developed as a way for me to learn Vue.js and Veutify. (Both V2).
+
+This projects also has CapacitorJS (V3.0.1) installed to generate Android APK.
 
 Currently deployed on RyeManorPi OpenHab installation at http://ryemanorpi:8080/static/dist/index.html
 
