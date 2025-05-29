@@ -4,11 +4,7 @@
       <v-col v-if="!configMode">
         <h3>{{ legend }}</h3>
         <p>{{ sim.stat() }}</p>
-        <line-chart
-          ref="simChart"
-          :chart-data="dataCollection"
-          :options="options"
-        ></line-chart>
+        <line-chart ref="simChart" :chart-data="dataCollection" :options="options"></line-chart>
       </v-col>
       <v-col cols="auto">
         <v-card v-if="configMode">
@@ -18,56 +14,28 @@
           <v-card-text>
             <v-form>
               <v-row class="pt-3">
-                <v-text-field
-                  label="Initial Net Worth"
-                  prefix="$"
-                  v-model="sim.initialCapital"
-                  type="number"
-                ></v-text-field>
+                <v-text-field label="Initial Net Worth" prefix="$" v-model="sim.initialCapital"
+                  type="number"></v-text-field>
               </v-row>
               <v-row>
                 <v-col>
                   <h2>Red Players</h2>
-                  <v-text-field
-                    label="Number of Players"
-                    v-model="numberRedPlayers"
-                    value="10"
-                    type="number"
-                  ></v-text-field>
-                  <v-combobox
-                    v-model="redFamily"
-                    :items="familyCodeList"
-                    dense
-                    solo
-                  ></v-combobox>
-                  <v-combobox
-                    v-model="redMotivation"
-                    :items="motivationCodeList"
-                    dense
-                    solo
-                  ></v-combobox>
+                  <v-text-field label="Number of Players" v-model="numberRedPlayers" value="10"
+                    type="number"></v-text-field>
+                  <v-combobox v-model="redFamily" :items="familyCodeList" item-title="text" item-value="value" dense
+                    solo></v-combobox>
+                  <v-combobox v-model="redMotivation" :items="motivationCodeList" item-title="text" item-value="value"
+                    dense solo></v-combobox>
                 </v-col>
                 <v-divider vertical></v-divider>
                 <v-col>
                   <h2>Blue Players</h2>
-                  <v-text-field
-                    label="Number of Players"
-                    v-model="numberBluePlayers"
-                    value="10"
-                    type="number"
-                  ></v-text-field>
-                  <v-combobox
-                    v-model="blueFamily"
-                    :items="familyCodeList"
-                    dense
-                    solo
-                  ></v-combobox>
-                  <v-combobox
-                    v-model="blueMotivation"
-                    :items="motivationCodeList"
-                    dense
-                    solo
-                  ></v-combobox>
+                  <v-text-field label="Number of Players" v-model="numberBluePlayers" value="10"
+                    type="number"></v-text-field>
+                  <v-combobox v-model="blueFamily" :items="familyCodeList" item-title="text" item-value="value" dense
+                    solo></v-combobox>
+                  <v-combobox v-model="blueMotivation" :items="motivationCodeList" item-title="text" item-value="value"
+                    dense solo></v-combobox>
                 </v-col>
               </v-row>
             </v-form>
@@ -76,9 +44,7 @@
           <v-divider></v-divider>
 
           <v-card-actions>
-            <v-btn dark color="primary" @click="configureSimulation"
-              >Run Simulation</v-btn
-            >
+            <v-btn dark color="primary" @click="configureSimulation">Run Simulation</v-btn>
           </v-card-actions>
         </v-card>
         <v-card v-else>
@@ -100,30 +66,16 @@
 
           <v-card-text>
             <v-form>
-              <v-slider
-                hint="Adjust the speed of the simulation: # transactions between updates"
-                thumb-label
-                max="500"
-                min="40"
-                label="Speed"
-                v-model="simulationSpeed"
-              ></v-slider>
+              <v-slider hint="Adjust the speed of the simulation: # transactions between updates" thumb-label max="500"
+                min="40" label="Speed" v-model="simulationSpeed"></v-slider>
               <v-row>
                 <v-switch v-model="sim.taxTheRich" label="Tax the Wealthy" />
                 <v-spacer></v-spacer>
-                <v-text-field
-                  append-icon="%"
-                  v-model="sim.richTaxPercentage"
-                  type="number"
-                  class="shortTextField"
-                ></v-text-field>
+                <v-text-field append-icon="%" v-model="sim.richTaxPercentage" type="number"
+                  class="shortTextField"></v-text-field>
               </v-row>
               <v-row>
-                <v-switch
-                  v-model="sim.giveWelfare"
-                  inset
-                  label="Give Welfare to lift above powerty line"
-                />
+                <v-switch v-model="sim.giveWelfare" inset label="Give Welfare to lift above powerty line" />
                 <!-- <v-text-field append-icon="%" v-model="sim.welfarePercentage" type="number" class="shrink"></v-text-field> -->
               </v-row>
             </v-form>
@@ -256,7 +208,7 @@ export default {
     };
   },
   computed: {},
-  mounted() {},
+  mounted() { },
   deactivated() {
     console.log("deactivated");
   },
@@ -340,7 +292,7 @@ export default {
 </script>
 
 <style scoped>
-.shortTextField{
-      width: 60px;
+.shortTextField {
+  width: 60px;
 }
 </style>

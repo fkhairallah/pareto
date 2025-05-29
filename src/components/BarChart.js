@@ -1,19 +1,24 @@
-import { Bar, mixins } from 'vue-chartjs'
-const { reactiveProp } = mixins
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export default {
+  name: 'BarChart',
   extends: Bar,
-  mixins: [reactiveProp],
-  props: ['options'],
-  mounted () {
-    // this.chartData is created in the mixin.
-    // If you want to pass options please create a local options object
-    this.refresh();
+  props: {
+    chartData: {
+      type: Object,
+      required: true
+    },
+    options: {
+      type: Object,
+      required: true
+    }
   },
   methods: {
-    refresh: function () {
-      this.renderChart(this.chartData, this.options);
+    refresh() {
+      this.$data._chart.update()
     }
   }
-
 }
