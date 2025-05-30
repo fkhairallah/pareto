@@ -73,14 +73,14 @@
     <v-row class="text-center">
       <v-col cols="12" class="pa-0">
         <v-divider></v-divider>
-        <canvas id="myChart"  style="width:100%; height:400"></canvas>         
+        <canvas id="myChart" style="width:100%; height:400"></canvas>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onBeforeUnmount, onMounted} from 'vue'
+import { ref, reactive, onBeforeUnmount } from 'vue'
 import {
   Chart as ChartJS,
   BarController,
@@ -89,7 +89,8 @@ import {
   Tooltip,
   Legend,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  ChartItem
 } from 'chart.js'
 // import { Bar } from 'vue-chartjs';
 import Pareto from "../model/pareto"
@@ -109,7 +110,7 @@ ChartJS.register(
 
 // Initialize Pareto simulation
 const pSim = new Pareto()
-let simInterval:any | null = null;
+let simInterval: any | null = null;
 
 
 // State
@@ -165,19 +166,9 @@ const chartOptions = {
   }
 }
 
-let myChart:any = null;
+let myChart: any = null;
 
-// onMounted(() => {
-//   const ctx = document.getElementById('myChart');
-//   myChart = new ChartJS(document.getElementById('myChart'),  {
-//     type: "bar",
-//     data: dataCollection,
-//     options: chartOptions
-//   });
 
-//  myChart.update();
-
-// });
 
 // Methods
 const configureSimulation = () => {
@@ -202,8 +193,8 @@ const configureSimulation = () => {
     myChart.destroy()
   }
 
-
-  myChart = new ChartJS(document.getElementById('myChart'), {
+  // Initialize chart
+  myChart = new ChartJS(document.getElementById('myChart') as ChartItem, {
     type: "bar",
     data: dataCollection,
     options: chartOptions
