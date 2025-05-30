@@ -21,4 +21,5 @@ export default defineConfig({
   server: {
     port: 8080, // Optional: configure dev server port
   },
+  base: './', // Optional: configure base path for production build
 })

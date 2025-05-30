@@ -12,9 +12,6 @@ const paretoMode = ref(false)
 
       <span class="mx-5">{{ (paretoMode? "Pareto Principle Simulation":"Tides In Ocean Ridge")}}</span>
       <v-spacer></v-spacer>
-      <v-btn v-if="paretoMode" flat href="https://en.wikipedia.org/wiki/Pareto_principle" target="_blank">
-        <span class="mr-2">Background Info</span>
-      </v-btn>
       <v-switch v-model="paretoMode" label="Pareto Mode" color="white" hide-details inset density="compact"
         class="mr-5"></v-switch>
 
