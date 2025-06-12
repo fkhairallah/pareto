@@ -21,6 +21,7 @@ const tideHeaders = [
 const startDate = ref(new Date());
 const startTime = ref();
 const tideHeight = ref(0);
+const nextClearanceTime = ref('');
 
 const tides = reactive({
   data: [] as TidePrediction[],
@@ -85,7 +86,21 @@ watch(startTime, async (newTime) => {
 
     const td = tidesHeight.data.find(t => new Date(t.t).getTime() > dateWithTime.getTime());
     tideHeight.value = td ? parseFloat(td.v) : 0;
+    
+    // Determine next tide clearance message based on current tide height
+    if (tideHeight.value > MrsCayClearance) {
+      const next = tidesHeight.data.find(t => new Date(t.t).getTime() > dateWithTime.getTime() && parseFloat(t.v) < MrsCayClearance);
+      nextClearanceTime.value = next
+        ? `Blocked at ${new Date(next.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+        : '';
+    } else {
+      const next = tidesHeight.data.find(t => new Date(t.t).getTime() > dateWithTime.getTime() && parseFloat(t.v) >= MrsCayClearance);
+      nextClearanceTime.value = next
+        ? `Open at ${new Date(next.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+        : '';
+    }
   }
+
 });
 
 
@@ -99,6 +114,19 @@ function formatDate(date: Date): string {
   return (y + m + d)
 }
 
+  // take a float string and return ft/inches 3'6"
+  function convertToFeetAndInches(feetString:string):string {
+      const feet = parseFloat(feetString);
+      if (isNaN(feet)) return "Invalid input";
+
+      const totalInches = Math.abs(feet * 12); 
+      const wholeFeet = Math.floor(Math.abs(feet)); 
+      const inches = Math.round(totalInches % 12);
+
+      return inches === 0 
+          ? `${feet < 0 ? '-' : ''}${wholeFeet} ft` 
+          : `${feet < 0 ? '-' : ''}${wholeFeet !== 0 ? wholeFeet + "'" : ''} ${inches}"`;
+  }
 // function to check if the time is allowed (every 5 minutes)
 function allowedMinutes(time: number): boolean {
   return time % 5 === 0;
@@ -132,7 +160,11 @@ function allowedMinutes(time: number): boolean {
           {{ new Date(item.t).toLocaleDateString('en-US', { weekday: 'long', hour: 'numeric', minute: 'numeric' }) }}
         </template>
         <template #item.v="{ item }">
-          <span :style="{ color: parseFloat(item.v) < MrsCayClearance ? 'red' : 'inherit' }">{{ item.v }} ft</span>
+          <div style="text-align: right">
+            <span :style="{ color: parseFloat(item.v) < MrsCayClearance ? 'red' : 'inherit' }">
+              {{ convertToFeetAndInches(item.v) }}
+            </span>
+          </div>
         </template>
       </v-data-table>
       <v-btn width="100%" href="https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8722718" target="_blank"
@@ -149,8 +181,10 @@ function allowedMinutes(time: number): boolean {
     </v-col>
     <v-col cols="12" md="6">
       <v-card>
-        <v-card-title :style="{ color: tideHeight < MrsCayClearance ? 'red' : 'green' }">Clearance: {{ tideHeight }}
-          ft.</v-card-title>
+        <v-card-title :style="{ color: tideHeight < MrsCayClearance ? 'red' : 'green' }">Clearance: {{ convertToFeetAndInches(tideHeight.toString()) }}</v-card-title>
+        <v-card-subtitle>
+          {{ nextClearanceTime }}
+        </v-card-subtitle>
       </v-card>
     </v-col>
 
