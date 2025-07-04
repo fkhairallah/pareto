@@ -14,7 +14,7 @@
     "@capacitor/cli": "^5.5.1",
     "@capacitor/core": "^5.5.1",
     "axios": "^1.4.0",
-    "chart.js": "4.3.3",
+    "chart.js": "^4.4.3",
     "date-fns": "^2.30.0",
     "vue": "^3.3.9",
     "vuetify": "^3.4.4",
