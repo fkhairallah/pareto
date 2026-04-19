@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const v = require\\('./node_modules/vuetify/package.json'\\); console.log\\(v.version\\)\")"
+    ]
+  }
+}
